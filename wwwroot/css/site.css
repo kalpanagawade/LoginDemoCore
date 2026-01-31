@@ -18,5 +18,63 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f2f2f2;
+}
+
+/* Card style */
+.form-box {
+    width: 350px;
+    margin: 100px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px gray;
+}
+
+h2 {
+    text-align: center;
+}
+
+/* Input */
+input[type=text],
+input[type=password] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border-radius:23px;
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 23px;
+    cursor: pointer;
+}
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+/* Messages */
+.success {
+    color: green;
+    text-align: center;
+}
+
+.error {
+    color: red;
+    text-align: center;
+}
+
+/* Link */
+a {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
 }

@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "SQL Module";
+}
+
+<h3>SQL Learning Module</h3>
+
+<div class="row">
+    <!-- SQL CONCEPT LIST -->
+    <div class="col-3 border-end">
+        <ul class="list-group">
+            <a class="list-group-item" asp-action="SqlTopic" asp-route-topic="Basics">SQL Basics</a>
+            <a class="list-group-item" asp-action="SqlTopic" asp-route-topic="CRUD">CRUD Operations</a>
+            <a class="list-group-item" asp-action="SqlTopic" asp-route-topic="Joins">Joins</a>
+            <a class="list-group-item" asp-action="SqlTopic" asp-route-topic="Functions">Functions</a>
+            <a class="list-group-item" asp-action="SqlTopic" asp-route-topic="Procedures">Stored Procedures</a>
+        </ul>
+    </div>
+
+    <!-- DETAILS AREA -->
+    <div class="col-9">
+        <p>Select a SQL topic to view details and practice.</p>
+    </div>
+</div>

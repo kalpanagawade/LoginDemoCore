@@ -51,6 +51,51 @@ namespace LoginDemo.Controllers
         public IActionResult Dashboard()
         {
             return View();
+
         }
+        
+        // GET: Register Page
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        // POST: Register Action
+        [HttpPost]
+        public IActionResult Register(UserModel model)
+        {
+            string connStr = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection con = new SqlConnection(connStr))
+            {
+                // Check if user already exists
+                string checkQuery = "SELECT COUNT(*) FROM Users WHERE Username=@u";
+                SqlCommand checkCmd = new SqlCommand(checkQuery, con);
+                checkCmd.Parameters.AddWithValue("@u", model.Username);
+
+                con.Open();
+                int userExists = (int)checkCmd.ExecuteScalar();
+
+                if (userExists > 0)
+                {
+                    ViewBag.Error = "Username already exists!";
+                    return View();
+                }
+
+                // Insert new user
+                string insertQuery = "INSERT INTO Users (Username, Password) VALUES (@u, @p)";
+                SqlCommand insertCmd = new SqlCommand(insertQuery, con);
+                insertCmd.Parameters.AddWithValue("@u", model.Username);
+                insertCmd.Parameters.AddWithValue("@p", model.Password);
+
+                insertCmd.ExecuteNonQuery();
+
+                ViewBag.Success = "Registration successful!";
+                ViewBag.ShowLoginButton = true;
+            }
+
+            return View();
+        }
+
     }
 }
