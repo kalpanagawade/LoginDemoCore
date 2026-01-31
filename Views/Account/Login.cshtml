@@ -1,21 +1,19 @@
 ﻿@model LoginDemo.Models.UserModel
 
-<h2>Login</h2>
+<div class="form-box">
+    <h2>Login</h2>
 
-<form asp-action="Login" method="post">
-    <div>
-        <label>Username</label><br />
-        <input asp-for="Username" />
-    </div>
+    <form asp-action="Login" method="post">
+        <label>Username</label>
+        <input asp-for="Username" type="text" />
 
-    <div>
-        <label>Password</label><br />
+        <label>Password</label>
         <input asp-for="Password" type="password" />
-    </div>
 
-    <br />
-    <button type="submit">Login</button>
+        <button type="submit">Login</button>
+    </form>
 
-    <br />
-    <span style="color:red">@ViewBag.Message</span>
-</form>
+    <div class="error">@ViewBag.Message</div>
+
+    <a asp-action="Register">New User? Register</a>
+</div>
