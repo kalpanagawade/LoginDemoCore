@@ -26,18 +26,23 @@
         <div class="row" style="margin-top:60px">
 
             <!-- LEFT SIDEBAR -->
+            <!-- LEFT SIDEBAR -->
             <div class="col-2 bg-light vh-100 border-end">
                 <h6 class="mt-3">Modules</h6>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Module" asp-action="Sql">
-                            SQL Module
-                        </a>
+
+                <ul class="list-group">
+
+                    <!-- SQL MODULE -->
+                    <li class="list-group-item fw-bold" onclick="toggleSQLMenu()">
+                        SQL Module ▼
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            C# Module
-                        </a>
+
+                    <!-- DYNAMIC LIST -->
+                    <div id="sqlSubMenu" style="display:none;"></div>
+
+                    <!-- C# MODULE -->
+                    <li class="list-group-item fw-bold" onclick="toggleSQLMenu()">
+                        C# Module ▼
                     </li>
                 </ul>
             </div>
@@ -51,6 +56,90 @@
     </div>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        let isLoaded = false;
+
+        function toggleSQLMenu() {
+            let menu = document.getElementById("sqlSubMenu");
+
+            // Toggle show/hide
+            if (menu.style.display === "none") {
+                menu.style.display = "block";
+
+                // Load only first time
+                if (!isLoaded) {
+                    loadTopics();
+                    isLoaded = true;
+                }
+            } else {
+                menu.style.display = "none";
+            }
+        }
+
+        function loadTopics() {
+            fetch('/Module/GetTopics')
+                .then(res => res.json())
+                .then(data => {
+
+                    let menu = document.getElementById("sqlSubMenu");
+                    menu.innerHTML = "";
+
+                    data.forEach(topic => {
+
+                        let item = document.createElement("li");
+                        item.className = "list-group-item";
+                        item.innerText = formatText(topic);
+
+                        // click event (load content)
+                        item.onclick = function () {
+                            loadTopic(topic);
+                        };
+
+                        menu.appendChild(item);
+                    });
+
+                });
+        }
+
+        // Format text (SQLBasics → SQL Basics)
+        function formatText(text) {
+            return text.replace(/([A-Z])/g, ' $1').trim();
+        }
+
+    </script>
+    <script>
+
+        function loadTopic(topicName) {
+            fetch('/Module/GetSqlTopic?topic=' + topicName)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("sqlBox").value = data;
+                });
+        }
+
+        // Replace old functions
+        function showSQLBasics() {
+            loadTopic('SQLBasics');
+        }
+
+        function showCRUD() {
+            loadTopic('CRUD');
+        }
+
+        function showJoins() {
+            loadTopic('Joins');
+        }
+
+        function showFunctions() {
+            loadTopic('Functions');
+        }
+
+        function showProcedures() {
+            loadTopic('Procedures');
+        }
+
+    </script>
 </body>
 
 </html>

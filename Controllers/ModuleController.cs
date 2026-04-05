@@ -93,5 +93,52 @@ namespace LoginDemo.Controllers
             sb.Append("</table>");
             return sb.ToString();
         }
+
+        [HttpGet]
+        public IActionResult GetSqlTopic(string topic)
+        {
+            string connStr = _configuration.GetConnectionString("DefaultConnection");
+
+            string result = "";
+
+            using (SqlConnection con = new SqlConnection(connStr))
+            {
+                string query = "SELECT TopicContent FROM SQLTopics WHERE TopicName=@topic";
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@topic", topic);
+
+                con.Open();
+                var data = cmd.ExecuteScalar();
+
+                if (data != null)
+                    result = data.ToString();
+            }
+
+            return Json(result);
+        }
+
+        [HttpGet]
+        public IActionResult GetTopics()
+        {
+            string connStr = _configuration.GetConnectionString("DefaultConnection");
+
+            List<string> topics = new List<string>();
+
+            using (SqlConnection con = new SqlConnection(connStr))
+            {
+                string query = "SELECT TopicName FROM SQLTopics";
+                SqlCommand cmd = new SqlCommand(query, con);
+
+                con.Open();
+                SqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    topics.Add(dr["TopicName"].ToString());
+                }
+            }
+
+            return Json(topics);
+        }
     }
 }
