@@ -33,12 +33,12 @@
                 <ul class="list-group">
 
                     <!-- SQL MODULE -->
-                    <li class="list-group-item fw-bold" onclick="toggleSQLMenu()">
+                    <li class="list-group-item fw-bold" onclick="toggleSQLMenu()" style="background-color: cadetblue !important;">
                         SQL Module ▼
                     </li>
 
                     <!-- DYNAMIC LIST -->
-                    <div id="sqlSubMenu" style="display:none;"></div>
+                    <div id="sqlSubMenu" class="list-group" style="display:none;"></div>
 
                     <!-- C# MODULE -->
                     <li class="list-group-item fw-bold" onclick="toggleSQLMenu()">
@@ -109,13 +109,23 @@
 
     </script>
     <script>
-
         function loadTopic(topicName) {
+
+            let box = document.getElementById("sqlBox");
+
+            // ✅ If NOT on SqlTopic page → redirect ONCE
+            if (!box) {
+                window.location.href = '/Module/SqlTopic?topic=' + topicName;
+                return;
+            }
+
+            // ✅ If already on page → just load data
             fetch('/Module/GetSqlTopic?topic=' + topicName)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById("sqlBox").value = data;
-                });
+                    box.value = data;
+                })
+                .catch(err => console.log(err));
         }
 
         // Replace old functions

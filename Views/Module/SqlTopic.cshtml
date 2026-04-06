@@ -17,36 +17,51 @@
     </div> *@
 
     <!-- RIGHT SIDE -->
-    <div class="col-9">
+    <div class="col-6">
         <textarea id="sqlBox" class="form-control" rows="18" readonly></textarea>
+    </div>
+
+    <div class="col-6">
+        <!-- ================= PRACTICE SECTION ================= -->
+        <form asp-action="ExecuteSql" method="post">
+        <div style="display:flex;">
+        <h4>Practice SQL</h4>
+        <button class="btn btn-primary mt-2">Execute</button>
+        </div>
+        <hr />
+
+            <div class="row">
+                <div class="col-12">
+                    <textarea name="sqlQuery"
+                              class="form-control"
+                              rows="8"
+                              placeholder="Write SQL query here...">@ViewBag.Query</textarea>
+                </div>
+            </div>
+
+            <div class="row">
+            <div class="col-12">
+                <div class="border p-3" style="min-height:200px; overflow:auto;">
+                    @Html.Raw(ViewBag.Result)
+                </div>
+            </div>
+            </div>
+        </form>
     </div>
 </div>
 
 <hr />
 
-<!-- ================= PRACTICE SECTION ================= -->
-<h4>Practice SQL</h4>
 
-<form asp-action="ExecuteSql" method="post">
-    <div class="row">
-        <div class="col-6">
-            <textarea name="sqlQuery"
-                      class="form-control"
-                      rows="8"
-                      placeholder="Write SQL query here...">@ViewBag.Query</textarea>
-
-            <button class="btn btn-primary mt-2">Execute</button>
-        </div>
-
-        <div class="col-6">
-            <div class="border p-3" style="min-height:200px; overflow:auto;">
-                @Html.Raw(ViewBag.Result)
-            </div>
-        </div>
-    </div>
-</form>
 
 <script>
+        window.onload = function () {
 
+        let topic = '@ViewBag.Topic';
+
+        if (topic) {
+            loadTopic(topic); // ✅ load automatically
+        }
+    }
 
     </script>
