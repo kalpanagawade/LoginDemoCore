@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/LoginDemo.styles.css" asp-append-version="true" />
+    <style>
+        #sidebarWrapper, #miniSidebar, #mainContent {
+            transition: all 0.3s ease;
+        }
+    </style>
 </head>
 <body>
     <!-- TOP NAVBAR -->
@@ -25,30 +30,54 @@
     <div class="container-fluid">
         <div class="row" style="margin-top:60px">
 
-            <!-- LEFT SIDEBAR -->
-            <!-- LEFT SIDEBAR -->
-            <div class="col-2 bg-light vh-100 border-end">
-                <h6 class="mt-3">Modules</h6>
+            <!-- ✅ SIDEBAR -->
+            <div id="sidebarWrapper" class="col-2 bg-light vh-100 border-end position-relative">
+
+                <!-- HEADER -->
+                <div class="d-flex justify-content-between align-items-center p-2">
+                    <h6 class="mt-2 mb-0">Modules</h6>
+
+                    <!-- MINUS BUTTON -->
+                    <button onclick="closeSidebar()" class="btn btn-sm btn-danger" style="width: 14%;">−</button>
+                </div>
 
                 <ul class="list-group">
 
                     <!-- SQL MODULE -->
-                    <li class="list-group-item fw-bold" onclick="toggleSQLMenu()" style="background-color: cadetblue !important;">
+                    <li class="list-group-item fw-bold"
+                        onclick="toggleSQLMenu()"
+                        style="background-color: cadetblue; cursor:pointer;">
                         SQL Module ▼
                     </li>
 
-                    <!-- DYNAMIC LIST -->
                     <div id="sqlSubMenu" class="list-group" style="display:none;"></div>
 
                     <!-- C# MODULE -->
-                    <li class="list-group-item fw-bold" onclick="toggleSQLMenu()">
+                    <li class="list-group-item fw-bold"
+                        onclick="togglecMenu()"
+                        style="background-color: antiquewhite; cursor:pointer;">
                         C# Module ▼
                     </li>
+
+                    <div id="cSubMenu" class="list-group" style="display:none;"></div>
+
                 </ul>
             </div>
 
-            <!-- PAGE CONTENT -->
-            <div class="col-10 p-4">
+            <!-- ✅ COLLAPSED VERTICAL TAB -->
+            <div id="miniSidebar" class="col-1"
+                 style="display:none; background:#343a40; color:white; cursor:pointer;width: 1%;"
+                 onclick="openSidebar()">
+
+                <div class="d-flex align-items-center justify-content-center vh-100">
+                    <span style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                        Modules
+                    </span>
+                </div>
+            </div>
+
+            <!-- ✅ MAIN CONTENT -->
+            <div id="mainContent" class="col p-4">
                 @RenderBody()
             </div>
 
@@ -58,48 +87,73 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
 
-        let isLoaded = false;
-
         function toggleSQLMenu() {
             let menu = document.getElementById("sqlSubMenu");
 
-            // Toggle show/hide
             if (menu.style.display === "none") {
                 menu.style.display = "block";
 
-                // Load only first time
-                if (!isLoaded) {
-                    loadTopics();
-                    isLoaded = true;
+                if (!isLoadedSQL) {
+                    loadTopics("SQL", "sqlSubMenu");
+                    isLoadedSQL = true;
                 }
             } else {
                 menu.style.display = "none";
             }
         }
 
-        function loadTopics() {
-            fetch('/Module/GetTopics')
+        function togglecMenu() {
+            let menu = document.getElementById("cSubMenu");
+
+            if (menu.style.display === "none") {
+                menu.style.display = "block";
+
+                if (!isLoadedC) {
+                    loadTopics("C#", "cSubMenu");
+                    isLoadedC = true;
+                }
+            } else {
+                menu.style.display = "none";
+            }
+        }
+
+        let isLoadedSQL = false;
+        let isLoadedC = false;
+
+        // 🔹 Common function (Dynamic)
+        function loadTopics(language, menuId) {
+
+            console.log("Calling API:", language);
+
+            fetch('/Module/GetTopics?language=' + encodeURIComponent(language))
                 .then(res => res.json())
                 .then(data => {
 
-                    let menu = document.getElementById("sqlSubMenu");
+                    console.log("Data:", data);
+
+                    let menu = document.getElementById(menuId);
                     menu.innerHTML = "";
+
+                    if (data.length === 0) {
+                        menu.innerHTML = "<li class='list-group-item'>No Topics Found</li>";
+                        return;
+                    }
 
                     data.forEach(topic => {
 
                         let item = document.createElement("li");
                         item.className = "list-group-item";
-                        item.innerText = formatText(topic);
+                        item.innerText = topic;
 
-                        // click event (load content)
                         item.onclick = function () {
-                            loadTopic(topic);
+                            loadTopic(topic); // your existing function
                         };
 
                         menu.appendChild(item);
                     });
 
-                });
+                })
+                .catch(err => console.error("Error:", err));
         }
 
         // Format text (SQLBasics → SQL Basics)
@@ -109,6 +163,20 @@
 
     </script>
     <script>
+        function closeSidebar() {
+
+            document.getElementById("sidebarWrapper").style.display = "none";
+            document.getElementById("miniSidebar").style.display = "block";
+
+        }
+
+        function openSidebar() {
+
+            document.getElementById("sidebarWrapper").style.display = "block";
+            document.getElementById("miniSidebar").style.display = "none";
+
+        }
+
         function loadTopic(topicName) {
 
             let box = document.getElementById("sqlBox");
