@@ -118,7 +118,7 @@ namespace LoginDemo.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetTopics()
+        public IActionResult GetTopics(string language)
         {
             string connStr = _configuration.GetConnectionString("DefaultConnection");
 
@@ -126,8 +126,9 @@ namespace LoginDemo.Controllers
 
             using (SqlConnection con = new SqlConnection(connStr))
             {
-                string query = "SELECT TopicName FROM SQLTopics";
+                string query = "SELECT TopicName FROM SQLTopics WHERE Language = @Language";
                 SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@Language", language);
 
                 con.Open();
                 SqlDataReader dr = cmd.ExecuteReader();
