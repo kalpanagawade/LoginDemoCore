@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace LoginDemo.Controllers
@@ -13,13 +18,41 @@ namespace LoginDemo.Controllers
         {
             _configuration = configuration;
         }
-
+                
         public IActionResult Sql()
         {
             return View();
         }
-
         public IActionResult SqlTopic(string topic)
+        {
+            ViewBag.Topic = topic;
+            return View();
+        }
+
+        //public IActionResult CSharpCompiler()
+        //{
+        //    return View();
+        //}
+        public IActionResult CSharpCompiler(string code = null)
+        {
+            if (string.IsNullOrEmpty(code))
+            {
+                code = @"using System;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(""Hello World"");
+    }
+}";
+            }
+
+            ViewBag.Code = code;
+
+            return View();
+        }
+        public IActionResult CSharpTopic(string topic)
         {
             ViewBag.Topic = topic;
             return View();
@@ -118,6 +151,44 @@ namespace LoginDemo.Controllers
         }
 
         [HttpGet]
+        public IActionResult GetCSharpTopic(string topic)
+        {
+            string connStr =_configuration.GetConnectionString("DefaultConnection");
+
+            string content = "";
+            string sampleCode = "";
+
+            using (SqlConnection con = new SqlConnection(connStr))
+            {
+                string query = @"
+            SELECT TopicContent, Code
+            FROM [C#Topics]
+            WHERE Id like '%0' and TopicName = @TopicName";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+
+                cmd.Parameters.AddWithValue("@TopicName", topic);
+
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        content = dr["TopicContent"].ToString();
+                        sampleCode = dr["Code"].ToString();
+                    }
+                }
+            }
+
+            return Json(new
+            {
+                content = content,
+                sampleCode = sampleCode
+            });
+        }
+
+        [HttpGet]
         public IActionResult GetTopics(string language)
         {
             string connStr = _configuration.GetConnectionString("DefaultConnection");
@@ -126,9 +197,19 @@ namespace LoginDemo.Controllers
 
             using (SqlConnection con = new SqlConnection(connStr))
             {
-                string query = "SELECT TopicName FROM SQLTopics WHERE Language = @Language";
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@Language", language);
+                SqlCommand cmd= new SqlCommand("", con);
+                if (language == "SQL")
+                {
+                    string query = "SELECT TopicName FROM SQLTopics WHERE Language = @Language";
+                    cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Language", language);
+                }
+                else if (language == "C#")
+                {
+                    string query = "SELECT TopicName FROM [C#Topics] where Id like '%0' and Language = @Language";
+                    cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Language", language);
+                }
 
                 con.Open();
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -141,5 +222,201 @@ namespace LoginDemo.Controllers
 
             return Json(topics);
         }
+
+        public class CSharpCodeRequest
+        {
+            public string Code { get; set; }
+        }
+
+        [HttpPost]
+        public IActionResult CompileCSharp(
+            [FromBody] CSharpCodeRequest request)
+        {
+            try
+            {
+                if (request == null ||
+                    string.IsNullOrWhiteSpace(request.Code))
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        output = "Please enter C# code."
+                    });
+                }
+
+                // ============================================
+                // CREATE SYNTAX TREE
+                // ============================================
+
+                SyntaxTree syntaxTree =
+                    CSharpSyntaxTree.ParseText(request.Code);
+
+
+                // ============================================
+                // GET .NET RUNTIME ASSEMBLIES
+                // ============================================
+
+                var references = new List<MetadataReference>();
+
+                var trustedAssemblies =
+                    AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")
+                    as string;
+
+                if (!string.IsNullOrEmpty(trustedAssemblies))
+                {
+                    foreach (var assemblyPath
+                             in trustedAssemblies.Split(
+                                 Path.PathSeparator))
+                    {
+                        references.Add(
+                            MetadataReference.CreateFromFile(
+                                assemblyPath));
+                    }
+                }
+
+
+                // ============================================
+                // CREATE COMPILATION
+                // ============================================
+
+                CSharpCompilation compilation =
+                    CSharpCompilation.Create(
+                        "CSharpPractice_" +
+                        Guid.NewGuid().ToString("N"),
+
+                        new[] { syntaxTree },
+
+                        references,
+
+                        new CSharpCompilationOptions(
+                            OutputKind.ConsoleApplication)
+                    );
+
+
+                // ============================================
+                // COMPILE
+                // ============================================
+
+                using var memoryStream =
+                    new MemoryStream();
+
+                EmitResult emitResult =
+                    compilation.Emit(memoryStream);
+
+
+                // ============================================
+                // COMPILATION ERROR
+                // ============================================
+
+                if (!emitResult.Success)
+                {
+                    var errors =
+                        emitResult.Diagnostics
+                            .Where(x =>
+                                x.Severity ==
+                                DiagnosticSeverity.Error)
+                            .Select(x => x.ToString());
+
+                    return Json(new
+                    {
+                        success = false,
+                        output = string.Join(
+                            Environment.NewLine,
+                            errors)
+                    });
+                }
+
+
+                // ============================================
+                // LOAD COMPILED ASSEMBLY
+                // ============================================
+
+                memoryStream.Position = 0;
+
+                Assembly assembly =
+                    Assembly.Load(
+                        memoryStream.ToArray());
+
+
+                // ============================================
+                // FIND MAIN METHOD
+                // ============================================
+
+                Type programType =
+                    assembly.GetTypes()
+                        .FirstOrDefault(t =>
+                            t.GetMethod(
+                                "Main",
+                                BindingFlags.Static |
+                                BindingFlags.Public |
+                                BindingFlags.NonPublic)
+                            != null);
+
+
+                if (programType == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        output = "Main() method not found."
+                    });
+                }
+
+
+                MethodInfo mainMethod =
+                    programType.GetMethod(
+                        "Main",
+                        BindingFlags.Static |
+                        BindingFlags.Public |
+                        BindingFlags.NonPublic);
+
+
+                // ============================================
+                // CAPTURE CONSOLE OUTPUT
+                // ============================================
+
+                TextWriter originalOutput =
+                    Console.Out;
+
+                using StringWriter writer =
+                    new StringWriter();
+
+                try
+                {
+                    Console.SetOut(writer);
+
+                    mainMethod.Invoke(
+                        null,
+                        null);
+                }
+                finally
+                {
+                    Console.SetOut(originalOutput);
+                }
+
+
+                // ============================================
+                // RETURN OUTPUT
+                // ============================================
+
+                return Json(new
+                {
+                    success = true,
+                    output = writer.ToString()
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    output =
+                        ex.InnerException?.Message
+                        ?? ex.Message
+                });
+            }
+        }
+
+
     }
 }

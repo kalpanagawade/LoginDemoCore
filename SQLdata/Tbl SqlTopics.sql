@@ -1,10 +1,11 @@
 ﻿CREATE TABLE SQLTopics (
     Id INT IDENTITY PRIMARY KEY,
     TopicName VARCHAR(50),
-    TopicContent NVARCHAR(MAX)
+    TopicContent NVARCHAR(MAX),
+	Language Varchar(50)
 );
 
-INSERT INTO SQLTopics (TopicName, TopicContent)
+INSERT INTO SQLTopics (TopicName, TopicContent,Language)
 VALUES 
 
 ('SQLBasics', '-- ================= SQL BASICS =================
@@ -54,7 +55,7 @@ ORDER BY Price DESC;
 
 -- 7️⃣ Filtering:
 SELECT * FROM CustomerP
-WHERE City = ''Mumbai'';'),
+WHERE City = ''Mumbai'';','SQL'),
 
 
 ('CRUD', '-- INSERT CUSTOMER
@@ -80,7 +81,7 @@ SET Price = 60000
 WHERE ProductId = 1;
 
 -- DELETE
-DELETE FROM OrderP WHERE OrderId = 1;'),
+DELETE FROM OrderP WHERE OrderId = 1;','SQL'),
 
 
 ('Joins', '-- INNER JOIN
@@ -96,7 +97,7 @@ INNER JOIN ProductP p ON o.ProductId = p.ProductId;
 -- LEFT JOIN
 SELECT c.CustomerName, o.OrderId
 FROM CustomerP c
-LEFT JOIN OrderP o ON c.CustomerId = o.CustomerId;'),
+LEFT JOIN OrderP o ON c.CustomerId = o.CustomerId;','SQL'),
 
 
 ('Functions', '-- COUNT
@@ -110,7 +111,7 @@ SELECT AVG(Price) AS AvgPrice FROM ProductP;
 
 -- DATE FUNCTION
 SELECT OrderId, YEAR(OrderDate) AS OrderYear
-FROM OrderP;'),
+FROM OrderP;','SQL'),
 
 
 ('Procedures', '-- CREATE PROCEDURE
@@ -128,4 +129,4 @@ BEGIN
 END;
 
 -- EXECUTE
-EXEC sp_GetOrders;');
+EXEC sp_GetOrders;','SQL');

@@ -1,0 +1,97 @@
+﻿@{
+    ViewData["Title"] = "C# Topic";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+
+        <!-- LEFT : NOTES -->
+        <div class="col-md-6">
+
+            <h2 id="topicTitle">@ViewBag.Topic</h2>
+
+            <hr />
+
+            <div id="topicContent">
+
+                Loading topic...
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT : SAMPLE CODE -->
+        <div class="col-md-6">
+
+            <div class="card">
+
+                <div class="card-header bg-dark text-white">
+
+                    <b>Sample C# Code</b>
+
+                    <button class="btn btn-success btn-sm float-end"
+                            onclick="openCompiler()">
+
+                        Compiler ▶
+
+                    </button>
+
+                </div>
+
+                <div class="card-body">
+
+                    <textarea id="sampleCode"
+                              class="form-control"
+                              rows="20"></textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const topic = '@ViewBag.Topic';
+
+    fetch('/Module/GetCSharpTopic?topic=' +
+        encodeURIComponent(topic))
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            document.getElementById("topicContent").innerHTML =
+                data.content;
+
+            document.getElementById("sampleCode").value =
+                data.sampleCode;
+
+        })
+        .catch(error => {
+
+            console.log(error);
+
+        });
+
+
+    function openCompiler() {
+
+        let code =
+            document.getElementById("sampleCode").value;
+
+        sessionStorage.setItem("CSharpCode", code);
+
+        window.location.href =
+            '/Module/CSharpCompiler';
+
+    }
+
+</script>
