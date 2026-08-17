@@ -122,6 +122,7 @@
 
         // 🔹 Common function (Dynamic)
         function loadTopics(language, menuId) {
+            debugger;
 
             console.log("Calling API:", language);
 
@@ -146,7 +147,8 @@
                         item.innerText = topic;
 
                         item.onclick = function () {
-                            loadTopic(topic); // your existing function
+                            //loadTopic(topic); // your existing function
+                            loadTopic(topic, language);
                         };
 
                         menu.appendChild(item);
@@ -177,45 +179,82 @@
 
         }
 
-        function loadTopic(topicName) {
+        // function loadTopic(topicName) {
+        //     debugger;
 
-            let box = document.getElementById("sqlBox");
+        //     let box = document.getElementById("sqlBox");
 
-            // ✅ If NOT on SqlTopic page → redirect ONCE
-            if (!box) {
-                window.location.href = '/Module/SqlTopic?topic=' + topicName;
-                return;
+        //     // ✅ If NOT on SqlTopic page → redirect ONCE
+        //     if (!box) {
+        //         window.location.href = '/Module/SqlTopic?topic=' + topicName;
+        //         return;
+        //     }
+
+        //     // ✅ If already on page → just load data
+        //     fetch('/Module/GetSqlTopic?topic=' + topicName)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             box.value = data;
+        //         })
+        //         .catch(err => console.log(err));
+        // }
+
+        function loadTopic(topicName, language) {
+
+            if (language === "SQL") 
+            {
+
+                let box = document.getElementById("sqlBox");
+
+                if (!box) {
+
+                    window.location.href =
+                        '/Module/SqlTopic?topic=' +
+                        encodeURIComponent(topicName);
+
+                    return;
+                }
+
+                fetch('/Module/GetSqlTopic?topic=' +
+                    encodeURIComponent(topicName))
+
+                    .then(response => response.json())
+
+                    .then(data => {
+                        box.value = data;
+                    })
+
+                    .catch(err => console.log(err));
+
             }
+            else if (language === "C#") {
 
-            // ✅ If already on page → just load data
-            fetch('/Module/GetSqlTopic?topic=' + topicName)
-                .then(response => response.json())
-                .then(data => {
-                    box.value = data;
-                })
-                .catch(err => console.log(err));
+                window.location.href =
+                    '/Module/CSharpTopic?topic=' +
+                    encodeURIComponent(topicName);
+            }
         }
 
         // Replace old functions
-        function showSQLBasics() {
-            loadTopic('SQLBasics');
-        }
+        // function showSQLBasics() {
+        //     loadTopic('SQLBasics');
+        // }
 
-        function showCRUD() {
-            loadTopic('CRUD');
-        }
+        // function showCRUD() {
+        //     loadTopic('CRUD');
+        // }
 
-        function showJoins() {
-            loadTopic('Joins');
-        }
+        // function showJoins() {
+        //     loadTopic('Joins');
+        // }
 
-        function showFunctions() {
-            loadTopic('Functions');
-        }
+        // function showFunctions() {
+        //     loadTopic('Functions');
+        // }
 
-        function showProcedures() {
-            loadTopic('Procedures');
-        }
+        // function showProcedures() {
+        //     loadTopic('Procedures');
+        // }
 
     </script>
 </body>
