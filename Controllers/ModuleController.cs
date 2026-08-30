@@ -163,7 +163,7 @@ class Program
                 string query = @"
             SELECT TopicContent, Code
             FROM [C#Topics]
-            WHERE Id like '%0' and TopicName = @TopicName";
+            WHERE TopicName = @TopicName";
 
                 SqlCommand cmd = new SqlCommand(query, con);
 
@@ -223,6 +223,53 @@ class Program
             return Json(topics);
         }
 
+        [HttpGet]
+        public IActionResult GetCSharpSubTopics(string topicName)
+        {
+            if (string.IsNullOrWhiteSpace(topicName))
+            {
+                return Json(new List<string>());
+            }
+
+            string query = @"
+        SELECT TopicName
+        FROM C#Topics
+        WHERE ParentID IN
+        (
+            SELECT ID
+            FROM C#Topics
+            WHERE TopicName = @TopicName
+        )
+        AND ID NOT IN
+        (
+            SELECT ID
+            FROM C#Topics
+            WHERE TopicName = @TopicName
+        )
+        ORDER BY ID";
+
+            var topics = new List<string>();
+
+            using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@TopicName", topicName);
+
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            topics.Add(reader["TopicName"].ToString());
+                        }
+                    }
+                }
+            }
+
+            return Json(topics);
+        }
         public class CSharpCodeRequest
         {
             public string Code { get; set; }

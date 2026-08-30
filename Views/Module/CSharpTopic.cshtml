@@ -82,16 +82,44 @@
         });
 
 
+    // function openCompiler() {
+    //     debugger;
+    //     let code =
+    //         document.getElementById("sampleCode").value;
+
+    //     sessionStorage.setItem("CSharpCode", code);
+
+    //     window.location.href =
+    //         '/Module/CSharpCompiler';
+
+    // }
+
     function openCompiler() {
+        let code = document.getElementById("sampleCode").value;
 
-        let code =
-            document.getElementById("sampleCode").value;
+         let finalCode = code;
 
-        sessionStorage.setItem("CSharpCode", code);
+        // Check whether "using System;" already exists
+        if (!/\busing\s+System\s*;/.test(finalCode)) {
+            finalCode = "using System;\n\n" + finalCode;
+        }
+
+        // Check whether Main() already exists
+        if (!/\bstatic\s+void\s+Main\s*\(/.test(finalCode)) {
+
+            finalCode += `
+
+    class Program
+    {
+        static void Main()
+        {
+            Console.WriteLine("Create Object and get Output");
+        }
+    }`;
+        }
 
         window.location.href =
-            '/Module/CSharpCompiler';
-
+            '/Module/CSharpCompiler?code=' + encodeURIComponent(finalCode);
     }
 
 </script>
