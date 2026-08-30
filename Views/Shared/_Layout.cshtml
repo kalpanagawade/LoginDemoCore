@@ -59,7 +59,13 @@
                         C# Module ▼
                     </li>
 
+                    @* <div id="cSubMenu" class="list-group" style="display:none;"></div> *@
                     <div id="cSubMenu" class="list-group" style="display:none;"></div>
+
+                    @* <div id="cSubTopics"
+                         class="list-group"
+                         style="display:none;">
+                    </div> *@
 
                 </ul>
             </div>
@@ -87,69 +93,223 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
 
-        function toggleSQLMenu() {
-            let menu = document.getElementById("sqlSubMenu");
+        // function toggleSQLMenu() {
+        //     let menu = document.getElementById("sqlSubMenu");
 
-            if (menu.style.display === "none") {
-                menu.style.display = "block";
+        //     if (menu.style.display === "none") {
+        //         menu.style.display = "block";
 
-                if (!isLoadedSQL) {
-                    loadTopics("SQL", "sqlSubMenu");
-                    isLoadedSQL = true;
-                }
-            } else {
-                menu.style.display = "none";
-            }
+        //         if (!isLoadedSQL) {
+        //             loadTopics("SQL", "sqlSubMenu");
+        //             isLoadedSQL = true;
+        //         }
+        //     } else {
+        //         menu.style.display = "none";
+        //     }
+        // }
+
+        // function togglecMenu() {
+        //     let menu = document.getElementById("cSubMenu");
+
+        //     if (menu.style.display === "none") {
+        //         menu.style.display = "block";
+
+        //         if (!isLoadedC) {
+        //             loadTopics("C#", "cSubMenu");
+        //             isLoadedC = true;
+        //         }
+        //     } else {
+        //         menu.style.display = "none";
+        //     }
+        // }
+
+        // let isLoadedSQL = false;
+        // let isLoadedC = false;
+
+let isLoadedSQL = false;
+let isLoadedC = false;
+
+function toggleSQLMenu() {
+
+    let menu = document.getElementById("sqlSubMenu");
+
+    if (menu.style.display === "none" || menu.style.display === "") {
+
+        menu.style.display = "block";
+
+        if (!isLoadedSQL) {
+            loadTopics("SQL", "sqlSubMenu");
+            isLoadedSQL = true;
         }
 
-        function togglecMenu() {
-            let menu = document.getElementById("cSubMenu");
+    } else {
 
-            if (menu.style.display === "none") {
-                menu.style.display = "block";
+        menu.style.display = "none";
+    }
+}
 
-                if (!isLoadedC) {
-                    loadTopics("C#", "cSubMenu");
-                    isLoadedC = true;
-                }
-            } else {
-                menu.style.display = "none";
-            }
+
+function togglecMenu() {
+
+    let menu = document.getElementById("cSubMenu");
+
+    if (menu.style.display === "none" || menu.style.display === "") {
+
+        menu.style.display = "block";
+
+        if (!isLoadedC) {
+            loadTopics("C#", "cSubMenu");
+            isLoadedC = true;
         }
 
-        let isLoadedSQL = false;
-        let isLoadedC = false;
+    } else {
 
-        // 🔹 Common function (Dynamic)
+        menu.style.display = "none";
+    }
+}
+
+        // function loadTopics(language, menuId) {
+        //     debugger;
+
+        //     console.log("Calling API:", language);
+
+        //     fetch('/Module/GetTopics?language=' + encodeURIComponent(language))
+        //         .then(res => res.json())
+        //         .then(data => {
+
+        //             console.log("Data:", data);
+
+        //             let menu = document.getElementById(menuId);
+        //             menu.innerHTML = "";
+
+        //             if (data.length === 0) {
+        //                 menu.innerHTML = "<li class='list-group-item'>No Topics Found</li>";
+        //                 return;
+        //             }
+
+        //             data.forEach(topic => {
+
+        //                 let item = document.createElement("li");
+        //                 item.className = "list-group-item";
+        //                 item.innerText = topic;
+
+        //                 item.onclick = function () {
+        //                     //loadTopic(topic); // your existing function
+        //                     loadTopic(topic, language);
+        //                 };
+
+        //                 menu.appendChild(item);
+        //             });
+
+        //         })
+        //         .catch(err => console.error("Error:", err));
+        // }
+
+
+        // function loadTopics(language, menuId) {
+
+        //     fetch('/Module/GetTopics?language=' +
+        //         encodeURIComponent(language))
+
+        //         .then(res => res.json())
+
+        //         .then(data => {
+
+        //             let menu = document.getElementById(menuId);
+
+        //             menu.innerHTML = "";
+
+        //             if (data.length === 0) {
+
+        //                 menu.innerHTML =
+        //                     "<li class='list-group-item'>No Topics Found</li>";
+
+        //                 return;
+        //             }
+
+        //             data.forEach(topic => {
+
+        //                 let item = document.createElement("li");
+
+        //                 item.className = "list-group-item";
+
+        //                 item.innerText = topic;
+
+        //                 item.style.cursor = "pointer";
+
+        //                 item.onclick = function (event) {
+
+        //                     event.stopPropagation();
+
+        //                     loadTopic(topic, language);
+        //                 };
+
+        //                 menu.appendChild(item);
+        //             });
+
+        //         })
+        //         .catch(err => console.error("Error:", err));
+        // }
+
         function loadTopics(language, menuId) {
-            debugger;
 
-            console.log("Calling API:", language);
+            fetch('/Module/GetTopics?language=' +
+                encodeURIComponent(language))
 
-            fetch('/Module/GetTopics?language=' + encodeURIComponent(language))
                 .then(res => res.json())
+
                 .then(data => {
 
-                    console.log("Data:", data);
-
                     let menu = document.getElementById(menuId);
+
                     menu.innerHTML = "";
 
                     if (data.length === 0) {
-                        menu.innerHTML = "<li class='list-group-item'>No Topics Found</li>";
+
+                        menu.innerHTML =
+                            "<li class='list-group-item'>No Topics Found</li>";
+
                         return;
                     }
 
                     data.forEach(topic => {
 
+                        // Parent Topic
                         let item = document.createElement("li");
+
                         item.className = "list-group-item";
+                        item.style.cursor = "pointer";
+
                         item.innerText = topic;
 
-                        item.onclick = function () {
-                            //loadTopic(topic); // your existing function
-                            loadTopic(topic, language);
+                        // Subtopic container INSIDE parent
+                        let subMenu = document.createElement("ul");
+
+                        subMenu.className = "list-group";
+                        subMenu.style.display = "none";
+                        subMenu.style.paddingLeft = "20px";
+
+                        // Parent click
+                        item.onclick = function (event) {
+
+                            event.stopPropagation();
+
+                            if (language === "C#") {
+
+                                // Load subtopics
+                                loadCSharpSubTopics(
+                                    topic,
+                                    subMenu
+                                );
+
+                            } else {
+
+                                loadTopic(topic, language);
+                            }
                         };
+
+                        // Put subMenu inside parent
+                        item.appendChild(subMenu);
 
                         menu.appendChild(item);
                     });
@@ -179,32 +339,54 @@
 
         }
 
-        // function loadTopic(topicName) {
-        //     debugger;
+        //  function loadTopic(topicName, language) {
 
-        //     let box = document.getElementById("sqlBox");
+        //     if (language === "SQL") {
 
-        //     // ✅ If NOT on SqlTopic page → redirect ONCE
-        //     if (!box) {
-        //         window.location.href = '/Module/SqlTopic?topic=' + topicName;
-        //         return;
+        //         let box = document.getElementById("sqlBox");
+
+        //         if (!box) {
+
+        //             window.location.href =
+        //                 '/Module/SqlTopic?topic=' +
+        //                 encodeURIComponent(topicName);
+
+        //             return;
+        //         }
+
+        //         fetch('/Module/GetSqlTopic?topic=' +
+        //             encodeURIComponent(topicName))
+
+        //             .then(response => response.json())
+
+        //             .then(data => {
+        //                 box.value = data;
+        //             })
+
+        //             .catch(err => console.log(err));
         //     }
 
-        //     // ✅ If already on page → just load data
-        //     fetch('/Module/GetSqlTopic?topic=' + topicName)
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             box.value = data;
-        //         })
-        //         .catch(err => console.log(err));
+        //     else if (language === "C#") {
+
+        //         // Remember selected C# parent topic
+        //         sessionStorage.setItem(
+        //             "CSharpParentTopic",
+        //             topicName
+        //         );
+
+        //         // Open C# topic page
+        //         window.location.href =
+        //             '/Module/CSharpTopic?topic=' +
+        //             encodeURIComponent(topicName);
+        //     }
         // }
 
-        function loadTopic(topicName, language) {
+         function loadTopic(topicName, language) {
 
-            if (language === "SQL") 
-            {
+            if (language === "SQL") {
 
-                let box = document.getElementById("sqlBox");
+                let box =
+                    document.getElementById("sqlBox");
 
                 if (!box) {
 
@@ -224,9 +406,11 @@
                         box.value = data;
                     })
 
-                    .catch(err => console.log(err));
-
+                    .catch(err =>
+                        console.log(err)
+                    );
             }
+
             else if (language === "C#") {
 
                 window.location.href =
@@ -235,27 +419,211 @@
             }
         }
 
-        // Replace old functions
-        // function showSQLBasics() {
-        //     loadTopic('SQLBasics');
+        // function loadTopic(topicName, language) {
+
+        //     if (language === "SQL") 
+        //     {
+
+        //         let box = document.getElementById("sqlBox");
+
+        //         if (!box) {
+
+        //             window.location.href =
+        //                 '/Module/SqlTopic?topic=' +
+        //                 encodeURIComponent(topicName);
+
+        //             return;
+        //         }
+
+        //         fetch('/Module/GetSqlTopic?topic=' +
+        //             encodeURIComponent(topicName))
+
+        //             .then(response => response.json())
+
+        //             .then(data => {
+        //                 box.value = data;
+        //             })
+
+        //             .catch(err => console.log(err));
+
+        //     }
+        //     // else if (language === "C#") {
+
+        //     //     window.location.href =
+        //     //         '/Module/CSharpTopic?topic=' +
+        //     //         encodeURIComponent(topicName);
+        //     // }
+        //     else if (language === "C#") {
+
+        //     loadCSharpSubTopics(topicName);
+
+        //     window.location.href =
+        //         '/Module/CSharpTopic?topic=' +
+        //         encodeURIComponent(topicName);
+        //     }
         // }
 
-        // function showCRUD() {
-        //     loadTopic('CRUD');
+        function loadCSharpSubTopics(topicName, subMenu) {
+
+            // If already loaded, just open/close
+            if (subMenu.getAttribute("data-loaded") === "true") {
+
+                if (subMenu.style.display === "none") {
+                    subMenu.style.display = "block";
+                } else {
+                    subMenu.style.display = "none";
+                }
+
+                return;
+            }
+
+            fetch('/Module/GetCSharpSubTopics?topicName=' +
+                encodeURIComponent(topicName))
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    subMenu.innerHTML = "";
+
+                    if (data.length === 0) {
+
+                        loadTopic(topicName, "C#");
+
+                        return;
+                    }
+
+                    data.forEach(subTopic => {
+
+                        let subItem =
+                            document.createElement("li");
+
+                        subItem.className =
+                            "list-group-item";
+
+                        subItem.innerText =
+                            "↳ " + subTopic;
+
+                        subItem.style.cursor =
+                            "pointer";
+
+                        // Subtopic click
+                        subItem.onclick =
+                            function (event) {
+
+                                event.stopPropagation();
+
+                                loadTopic(
+                                    subTopic,
+                                    "C#"
+                                );
+                            };
+
+                        subMenu.appendChild(subItem);
+                    });
+
+                    // Mark as loaded
+                    subMenu.setAttribute(
+                        "data-loaded",
+                        "true"
+                    );
+
+                    // Open subtopics
+                    subMenu.style.display = "block";
+
+                })
+
+                .catch(err =>
+                    console.error(
+                        "C# Sub Topic Error:",
+                        err
+                    )
+                );
+        }
+
+        //  function loadCSharpSubTopics(topicName) {
+
+        //     let menu = document.getElementById("cSubTopics");
+
+        //     if (!menu) {
+        //         return;
+        //     }
+
+        //     fetch('/Module/GetCSharpSubTopics?topicName=' +
+        //         encodeURIComponent(topicName))
+
+        //         .then(response => response.json())
+
+        //         .then(data => {
+
+        //             menu.innerHTML = "";
+
+        //             if (data.length === 0) {
+        //                 return;
+        //             }
+
+        //             data.forEach(subTopic => {
+
+        //                 let item = document.createElement("li");
+
+        //                 item.className = "list-group-item";
+
+        //                 item.innerText = "↳ " + subTopic;
+
+        //                 item.style.cursor = "pointer";
+
+        //                 // IMPORTANT
+        //                 item.onclick = function (event) {
+
+        //                     event.stopPropagation();
+
+        //                     loadTopic(subTopic, "C#");
+        //                 };
+
+        //                 menu.appendChild(item);
+        //             });
+
+        //             // Keep submenu OPEN
+        //             menu.style.display = "block";
+
+        //         })
+
+        //         .catch(err => {
+        //             console.error(
+        //                 "C# Sub Topic Error:",
+        //                 err
+        //             );
+        //         });
         // }
 
-        // function showJoins() {
-        //     loadTopic('Joins');
-        // }
 
-        // function showFunctions() {
-        //     loadTopic('Functions');
-        // }
+        document.addEventListener("DOMContentLoaded", function () {
 
-        // function showProcedures() {
-        //     loadTopic('Procedures');
-        // }
+            let parentTopic =
+                sessionStorage.getItem("CSharpParentTopic");
 
+            if (parentTopic) {
+
+                // Open C# submenu
+                let menu =
+                    document.getElementById("cSubMenu");
+
+                menu.style.display = "block";
+
+                // Load C# parent topics if required
+                if (!isLoadedC) {
+
+                    loadTopics("C#", "cSubMenu");
+
+                    isLoadedC = true;
+                }
+
+                // Load child topics
+                loadCSharpSubTopics(parentTopic);
+            }
+
+        });
+        
     </script>
 </body>
 
