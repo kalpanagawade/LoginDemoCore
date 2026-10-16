@@ -206,7 +206,13 @@ class Program
                 }
                 else if (language == "C#")
                 {
-                    string query = "SELECT TopicName FROM [C#Topics] where Id like '%0' and Language = @Language";
+                    //string query = "SELECT TopicName FROM [C#Topics] where Id like '%0' and Language = @Language";
+                    string query = @"
+    SELECT TopicName
+    FROM dbo.[C#Topics]
+    WHERE ParentID = Id
+      AND Language = @Language
+    ORDER BY Id";
                     cmd = new SqlCommand(query, con);
                     cmd.Parameters.AddWithValue("@Language", language);
                 }
@@ -231,22 +237,33 @@ class Program
                 return Json(new List<string>());
             }
 
+            //    string query = @"
+            //SELECT TopicName
+            //FROM C#Topics
+            //WHERE ParentID IN
+            //(
+            //    SELECT ID
+            //    FROM C#Topics
+            //    WHERE TopicName = @TopicName
+            //)
+            //AND ID NOT IN
+            //(
+            //    SELECT ID
+            //    FROM C#Topics
+            //    WHERE TopicName = @TopicName
+            //)
+            //ORDER BY ID";
+
             string query = @"
-        SELECT TopicName
-        FROM C#Topics
-        WHERE ParentID IN
-        (
-            SELECT ID
-            FROM C#Topics
-            WHERE TopicName = @TopicName
-        )
-        AND ID NOT IN
-        (
-            SELECT ID
-            FROM C#Topics
-            WHERE TopicName = @TopicName
-        )
-        ORDER BY ID";
+    SELECT Child.TopicName
+    FROM dbo.[C#Topics] AS Child
+    INNER JOIN dbo.[C#Topics] AS Parent
+        ON Child.ParentID = Parent.Id
+    WHERE Parent.TopicName = @TopicName
+      AND Parent.Language = 'C#'
+      AND Child.Language = 'C#'
+      AND Child.Id <> Parent.Id
+    ORDER BY Child.Id";
 
             var topics = new List<string>();
 

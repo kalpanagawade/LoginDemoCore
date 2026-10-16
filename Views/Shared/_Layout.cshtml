@@ -463,83 +463,144 @@ function togglecMenu() {
         //     }
         // }
 
+        // function loadCSharpSubTopics(topicName, subMenu) {
+
+        //     // If already loaded, just open/close
+        //     if (subMenu.getAttribute("data-loaded") === "true") {
+
+        //         if (subMenu.style.display === "none") {
+        //             subMenu.style.display = "block";
+        //         } else {
+        //             subMenu.style.display = "none";
+        //         }
+
+        //         return;
+        //     }
+
+        //     fetch('/Module/GetCSharpSubTopics?topicName=' +
+        //         encodeURIComponent(topicName))
+
+        //         .then(response => response.json())
+
+        //         .then(data => {
+
+        //             subMenu.innerHTML = "";
+
+        //             if (data.length === 0) {
+
+        //                 loadTopic(topicName, "C#");
+
+        //                 return;
+        //             }
+
+        //             data.forEach(subTopic => {
+
+        //                 let subItem =
+        //                     document.createElement("li");
+
+        //                 subItem.className =
+        //                     "list-group-item";
+
+        //                 subItem.innerText =
+        //                     "↳ " + subTopic;
+
+        //                 subItem.style.cursor =
+        //                     "pointer";
+
+        //                 // Subtopic click
+        //                 subItem.onclick =
+        //                     function (event) {
+
+        //                         event.stopPropagation();
+
+        //                         loadTopic(
+        //                             subTopic,
+        //                             "C#"
+        //                         );
+        //                     };
+
+        //                 subMenu.appendChild(subItem);
+        //             });
+
+        //             // Mark as loaded
+        //             subMenu.setAttribute(
+        //                 "data-loaded",
+        //                 "true"
+        //             );
+
+        //             // Open subtopics
+        //             subMenu.style.display = "block";
+
+        //         })
+
+        //         .catch(err =>
+        //             console.error(
+        //                 "C# Sub Topic Error:",
+        //                 err
+        //             )
+        //         );
+        // }
+        //Comment and replace 16102026
+
         function loadCSharpSubTopics(topicName, subMenu) {
 
-            // If already loaded, just open/close
+            // Toggle the menu if it has already been loaded
             if (subMenu.getAttribute("data-loaded") === "true") {
-
-                if (subMenu.style.display === "none") {
-                    subMenu.style.display = "block";
-                } else {
-                    subMenu.style.display = "none";
-                }
-
+                subMenu.style.display =
+                    subMenu.style.display === "none" ? "block" : "none";
                 return;
             }
 
             fetch('/Module/GetCSharpSubTopics?topicName=' +
                 encodeURIComponent(topicName))
-
-                .then(response => response.json())
-
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to load subtopics");
+                    }
+                    return response.json();
+                })
                 .then(data => {
 
-                    subMenu.innerHTML = "";
-
+                    // No children: open the selected topic's content page
                     if (data.length === 0) {
-
                         loadTopic(topicName, "C#");
-
                         return;
                     }
 
+                    subMenu.innerHTML = "";
+
                     data.forEach(subTopic => {
 
-                        let subItem =
-                            document.createElement("li");
+                        let subItem = document.createElement("li");
+                        subItem.className = "list-group-item";
+                        subItem.style.cursor = "pointer";
+                        subItem.innerText = "↳ " + subTopic;
 
-                        subItem.className =
-                            "list-group-item";
+                        // Each topic gets its own child menu
+                        let childMenu = document.createElement("ul");
+                        childMenu.className = "list-group";
+                        childMenu.style.display = "none";
+                        childMenu.style.paddingLeft = "20px";
 
-                        subItem.innerText =
-                            "↳ " + subTopic;
+                        subItem.appendChild(childMenu);
 
-                        subItem.style.cursor =
-                            "pointer";
+                        subItem.onclick = function (event) {
+                            event.stopPropagation();
 
-                        // Subtopic click
-                        subItem.onclick =
-                            function (event) {
-
-                                event.stopPropagation();
-
-                                loadTopic(
-                                    subTopic,
-                                    "C#"
-                                );
-                            };
+                            loadCSharpSubTopics(subTopic, childMenu);
+                        };
 
                         subMenu.appendChild(subItem);
                     });
 
-                    // Mark as loaded
-                    subMenu.setAttribute(
-                        "data-loaded",
-                        "true"
-                    );
-
-                    // Open subtopics
+                    subMenu.setAttribute("data-loaded", "true");
                     subMenu.style.display = "block";
-
                 })
-
-                .catch(err =>
-                    console.error(
-                        "C# Sub Topic Error:",
-                        err
-                    )
-                );
+                .catch(error => {
+                    console.error("Error loading C# subtopics:", error);
+                });
         }
+
 
         //  function loadCSharpSubTopics(topicName) {
 

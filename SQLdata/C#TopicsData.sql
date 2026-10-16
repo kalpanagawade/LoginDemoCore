@@ -72,6 +72,82 @@
 --    }
 --}', N'C#')
 --GO
+--INSERT [dbo].[C#Topics] ([Id], [ParentID], [TopicName], [TopicContent], [Code], [Language]) VALUES (15, 10, N'Abstraction', N'Abstraction is an OOP concept that hides the internal implementation details and exposes only the necessary functionality to the user.Real-Life Example  :-Example: ATM Machine
+
+--When you withdraw money from an ATM:
+--You insert the card.->Enter the PIN.->Select Withdraw.->Enter the amount.
+
+--You get the cash.
+
+--You don''t know how the ATM communicates with the bank, verifies your account, or processes the transaction.
+
+--➡️ You only know what it does, not how it works.', N'abstract class Animal
+--{
+--    public abstract void Sound();
+
+--    public void Eat()
+--    {
+--        Console.WriteLine(""Animal is eating"");
+--    }
+--}
+
+--class Dog : Animal
+--{
+--    public override void Sound()
+--    {
+--        Console.WriteLine(""Dog barks"");
+--    }
+--}
+
+--class Program
+--{
+--    static void Main()
+--    {
+--        Dog d = new Dog();
+
+--        d.Sound();
+--        d.Eat();
+--    }
+--}', N'C#')
+--GO
+--INSERT [dbo].[C#Topics] ([Id], [ParentID], [TopicName], [TopicContent], [Code], [Language]) VALUES (16, 10, N'Inheritance', N'Inheritance is an OOP feature that allows one class (derived class) to inherit the fields, properties, and methods of another class (base class), promoting code reuse and extensibility.Real-Life Example
+--👨 Parent and Child
+
+--A child inherits many characteristics from their parents, such as:
+--Eye color->Hair color->Height->Family name
+
+--Similarly, in C#:
+
+--Parent Class (Base Class) contains common features.
+--Child Class (Derived Class) inherits those features and can also add its own.', N'using System;
+
+--class Animal
+--{
+--    public void Eat()
+--    {
+--        Console.WriteLine(""Animal is eating"");
+--    }
+--}
+
+--class Dog : Animal
+--{
+--    public void Bark()
+--    {
+--        Console.WriteLine(""Dog is barking"");
+--    }
+--}
+
+--class Program
+--{
+--    static void Main()
+--    {
+--        Dog d = new Dog();
+
+--        d.Eat();    // Inherited method
+--        d.Bark();   // Own method
+--    }
+--}', N'C#')
+--GO
 --INSERT [dbo].[C#Topics] ([Id], [ParentID], [TopicName], [TopicContent], [Code], [Language]) VALUES (20, 20, N'Class', N'Class', N'class Student
 --{
 --    public string Name;
@@ -222,4 +298,39 @@
 --        v.Run();
 --    }
 --}', N'C#')
+--GO
+--INSERT [dbo].[C#Topics] ([Id], [ParentID], [TopicName], [TopicContent], [Code], [Language]) VALUES (25, 16, N'Single Inheritance', N'A class inherits from one base class.', N'class Animal { public void Eat() { } }
+--class Dog : Animal { }', N'C#')
+--GO
+--INSERT [dbo].[C#Topics] ([Id], [ParentID], [TopicName], [TopicContent], [Code], [Language]) VALUES (26, 16, N'Multilevel Inheritance', N'A class inherits from a class that already inherits from another class.', N'class Animal { }
+--class Dog : Animal { }
+--class Puppy : Dog { }', N'C#')
+--GO
+--INSERT [dbo].[C#Topics] ([Id], [ParentID], [TopicName], [TopicContent], [Code], [Language]) VALUES (27, 16, N'Hierarchical Inheritance', N'Multiple derived classes inherit from the same base class.', N'class Animal { }
+--class Dog : Animal { }
+--class Cat : Animal { }', N'C#')
+--GO
+--INSERT [dbo].[C#Topics] ([Id], [ParentID], [TopicName], [TopicContent], [Code], [Language]) VALUES (28, 16, N'Multiple Inheritance', N'C# does not support inheriting from multiple classes, but a class can implement multiple interfaces.', N'interface IA { }
+--interface IB { }
+--class Demo : IA, IB { }', N'C#')
+--GO
+--INSERT [dbo].[C#Topics] ([Id], [ParentID], [TopicName], [TopicContent], [Code], [Language]) VALUES (29, 25, N'Single Inheritance Example', N'Example of a Dog class inheriting from Animal.', N'class Animal
+--{
+--    public void Eat()
+--    {
+--        Console.WriteLine("Animal is eating");
+--    }
+--}
+
+--class Dog : Animal
+--{
+--    public void Bark()
+--    {
+--        Console.WriteLine("Dog is barking");
+--    }
+--}', N'C#')
+--GO
+--INSERT [dbo].[C#Topics] ([Id], [ParentID], [TopicName], [TopicContent], [Code], [Language]) VALUES (30, 25, N'Single Inheritance Output', N'The derived class can call the inherited public method.', N'Dog d = new Dog();
+--d.Eat();
+--d.Bark();', N'C#')
 --GO
