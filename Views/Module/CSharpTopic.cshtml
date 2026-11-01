@@ -7,7 +7,7 @@
     <div class="row">
 
         <!-- LEFT : NOTES -->
-        <div class="col-md-6">
+@*         <div class="col-md-6">
 
             <h2 id="topicTitle">@ViewBag.Topic</h2>
 
@@ -19,11 +19,55 @@
 
             </div>
 
+        </div> *@
+
+        <div class="row g-4">
+            <!-- LEFT : TOPIC DETAILS -->
+            <div class="col-md-6">
+                <div class="topic-card p-4 rounded-4 shadow-sm bg-white border h-100">
+                    <!-- Header -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h2 id="topicTitle" class="fw-bold text-dark mb-0">@ViewBag.Topic</h2>
+                        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold">C# Concept</span>
+                    </div>
+
+                    <hr class="text-muted opacity-25 mb-4">
+
+                    <!-- Main Content Area -->
+                    <div id="topicContent" class="text-secondary">
+                        <!-- Loading Spinner -->
+                        <div class="d-flex align-items-center text-muted py-3">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            <span>Loading topic details...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT : SAMPLE CODE & COMPILER -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                    <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between py-3 px-4">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-code-slash me-1"></i> Sample C# Code
+                        </h6>
+                        <button class="btn btn-success btn-sm fw-semibold px-3" onclick="openCompiler()">
+                            Compiler ▶
+                        </button>
+                    </div>
+                    <div class="card-body bg-dark p-3">
+                        <textarea id="sampleCode"
+                                  class="form-control font-monospace bg-dark text-light border-0"
+                                  rows="18"
+                                  readonly
+                                  placeholder="// Select a topic to view code..."></textarea>
+                    </div>
+                </div>
+            </div>
         </div>
 
-
         <!-- RIGHT : SAMPLE CODE -->
-        <div class="col-md-6">
+        @* <div class="col-md-6">
 
             <div class="card">
 
@@ -50,12 +94,52 @@
 
             </div>
 
-        </div>
+        </div> *@
 
     </div>
 
 </div>
 
+<!-- jQuery and AJAX script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var currentTopic = "@ViewBag.Topic";
+
+        if (currentTopic) {
+            $.ajax({
+                url: '@Url.Action("GetCSharpTopic", "Module")',
+                type: 'GET',
+                data: { topic: currentTopic },
+                success: function (response) {
+                    // 1. Populate main content
+                    if (response.content) {
+                        $('#topicContent').html(response.content);
+                    } else {
+                        $('#topicContent').html('<p class="text-muted">No content found for this topic.</p>');
+                    }
+
+                    // 2. Populate sample code textarea
+                    if (response.sampleCode) {
+                        $('#sampleCode').val(response.sampleCode);
+                    } else {
+                        $('#sampleCode').val("// No sample code available for this topic.");
+                    }
+                },
+                error: function () {
+                    $('#topicContent').html('<div class="alert alert-danger">Failed to load topic details.</div>');
+                }
+            });
+        }
+    });
+
+    // Dummy placeholder for your compiler button function
+    function openCompiler() {
+        var code = $('#sampleCode').val();
+        console.log("Opening compiler with code:", code);
+        // Add your logic here to pass the code to your compiler view or modal
+    }
+</script>
 
 <script>
 
