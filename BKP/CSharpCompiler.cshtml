@@ -1,0 +1,346 @@
+﻿@{
+    ViewData["Title"] = "C# Compiler";
+}
+
+<style>
+
+    body {
+        overflow: hidden;
+    }
+
+    .compiler-container {
+        height: calc(100vh - 100px);
+        margin-top: 10px;
+    }
+
+    .compiler-panel {
+        height: 100%;
+        border: 1px solid #ddd;
+        background-color: white;
+    }
+
+    .compiler-header {
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 12px;
+        border-bottom: 1px solid #ddd;
+        background-color: #fafafa;
+    }
+
+    .file-name {
+        font-weight: 500;
+        color: #333;
+    }
+
+    .run-button {
+        background-color: #e91e63;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .run-button:hover {
+            background-color: #d81b60;
+        }
+
+    .editor {
+        width: 100%;
+        height: calc(100% - 45px);
+        border: none;
+        outline: none;
+        resize: none;
+        padding: 15px;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 15px;
+        line-height: 1.5;
+        background-color: #ffffff;
+        color: #222;
+        tab-size: 4;
+    }
+
+    .output-header {
+        height: 45px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        border-bottom: 1px solid #ddd;
+        background-color: #fafafa;
+        font-weight: bold;
+    }
+
+    .output-info {
+        font-size: 12px;
+        color: #777;
+        margin-left: 15px;
+        font-weight: normal;
+    }
+
+    .output-area {
+        height: calc(100% - 45px);
+        padding: 15px;
+        overflow: auto;
+        background-color: white;
+    }
+
+    #output {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 15px;
+    }
+
+    .success {
+        color: #198754;
+    }
+
+    .error {
+        color: #dc3545;
+    }
+
+    .running {
+        color: #666;
+    }
+
+</style>
+
+
+<div class="container-fluid compiler-container">
+
+    <div class="row h-100 g-0">
+
+        <!-- ========================= -->
+        <!-- LEFT SIDE - CODE EDITOR -->
+        <!-- ========================= -->
+
+        <div class="col-md-6 h-100">
+
+            <div class="compiler-panel">
+
+                <!-- HEADER -->
+
+                <div class="compiler-header">
+
+                    <div class="file-name">
+
+                        <span style="margin-right:8px;">
+                            🔷
+                        </span>
+
+                        HelloWorld.cs
+
+                    </div>
+
+                    <button type="button"
+                            id="runButton"
+                            class="run-button"
+                            onclick="runCode()">
+
+                        Run ▶
+
+                    </button>
+
+                </div>
+
+
+                <!-- CODE EDITOR -->
+
+                <textarea id="codeEditor"
+                          class="editor"
+                          spellcheck="false">@ViewBag.Code</textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- RIGHT SIDE - OUTPUT -->
+        <!-- ========================= -->
+
+        <div class="col-md-6 h-100">
+
+            <div class="compiler-panel">
+
+                <div class="output-header">
+
+                    Output:
+
+                    <span id="status"
+                          class="output-info">
+                    </span>
+
+                </div>
+
+
+                <div class="output-area">
+
+                    <pre id="output"></pre>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // ============================================
+    // RUN C# CODE
+    // ============================================
+
+    async function runCode() {
+
+        const code =
+            document.getElementById("codeEditor").value;
+
+        const output =
+            document.getElementById("output");
+
+        const status =
+            document.getElementById("status");
+
+        const runButton =
+            document.getElementById("runButton");
+
+
+        // Validation
+
+        if (!code.trim()) {
+
+            output.className = "error";
+
+            output.innerText =
+                "Please enter C# code.";
+
+            return;
+        }
+
+
+        // Show running
+
+        output.className = "running";
+
+        output.innerText =
+            "Compiling and running...";
+
+        status.innerText =
+            "Running...";
+
+        runButton.disabled = true;
+
+        runButton.innerText =
+            "Running...";
+
+
+        try {
+
+            const response =
+                await fetch('/Module/CompileCSharp', {
+
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        code: code
+                    })
+
+                });
+
+
+            const result =
+                await response.json();
+
+
+            // Compilation / execution successful
+
+            if (result.success) {
+
+                output.className = "success";
+
+                output.innerText =
+                    result.output || "(Program finished with no output)";
+
+                status.innerText =
+                    "Completed";
+
+            }
+            else {
+
+                output.className = "error";
+
+                output.innerText =
+                    result.output;
+
+                status.innerText =
+                    "Error";
+
+            }
+
+        }
+        catch (error) {
+
+            output.className = "error";
+
+            output.innerText =
+                "Error connecting to compiler:\n\n" +
+                error;
+
+            status.innerText =
+                "Error";
+
+        }
+        finally {
+
+            runButton.disabled = false;
+
+            runButton.innerText =
+                "Run ▶";
+
+        }
+
+    }
+
+
+    // ============================================
+    // TAB KEY SUPPORT
+    // ============================================
+
+    document
+        .getElementById("codeEditor")
+        .addEventListener("keydown", function (event) {
+
+            if (event.key === "Tab") {
+
+                event.preventDefault();
+
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+
+                this.value =
+                    this.value.substring(0, start) +
+                    "    " +
+                    this.value.substring(end);
+
+                this.selectionStart =
+                    this.selectionEnd =
+                    start + 4;
+
+            }
+
+        });
+
+</script>

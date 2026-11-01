@@ -3,88 +3,143 @@
 }
 
 <style>
+    :root {
+        --bg-main: #121214;
+        --panel-bg: #1e1e24;
+        --panel-header: #18181b;
+        --border-color: #27272a;
+        --text-primary: #f4f4f5;
+        --text-secondary: #a1a1aa;
+        --accent-green: #22c55e;
+        --accent-green-hover: #16a34a;
+        --accent-blue: #3b82f6;
+    }
 
     body {
         overflow: hidden;
+        background-color: var(--bg-main) !important;
+        color: var(--text-primary);
     }
 
     .compiler-container {
-        height: calc(100vh - 100px);
+        height: calc(100vh - 85px);
         margin-top: 10px;
     }
 
     .compiler-panel {
         height: 100%;
-        border: 1px solid #ddd;
-        background-color: white;
+        border: 1px solid var(--border-color);
+        background-color: var(--panel-bg);
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     }
 
-    .compiler-header {
-        height: 45px;
+    .compiler-header, .output-header {
+        width: 328%;
+        height: 48px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 12px;
-        border-bottom: 1px solid #ddd;
-        background-color: #fafafa;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--panel-header);
+        user-select: none;
     }
 
     .file-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         font-weight: 500;
-        color: #333;
+        color: var(--text-primary);
+        font-size: 0.9rem;
     }
 
+    .file-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        background-color: #68217a;
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: bold;
+        border-radius: 4px;
+    }
+
+    /* Premium Modern Run Button */
     .run-button {
-        background-color: #e91e63;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, var(--accent-green) 0%, #15803d 100%);
         color: white;
         border: none;
-        padding: 8px 20px;
-        border-radius: 8px;
-        font-weight: bold;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
         cursor: pointer;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-        .run-button:hover {
-            background-color: #d81b60;
+        .run-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #16a34a 0%, #166534 100%);
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .run-button:active:not(:disabled) {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .run-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
     .editor {
         width: 100%;
-        height: calc(100% - 45px);
+        height: calc(100% - 48px);
         border: none;
         outline: none;
         resize: none;
-        padding: 15px;
+        padding: 16px;
         font-family: Consolas, "Courier New", monospace;
-        font-size: 15px;
+        font-size: 0.95rem;
         line-height: 1.5;
-        background-color: #ffffff;
-        color: #222;
+        background-color: var(--panel-bg);
+        color: #d4d4d4;
         tab-size: 4;
     }
 
-    .output-header {
-        height: 45px;
-        display: flex;
-        align-items: center;
-        padding: 0 12px;
-        border-bottom: 1px solid #ddd;
-        background-color: #fafafa;
-        font-weight: bold;
+    .output-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9rem;
     }
 
     .output-info {
-        font-size: 12px;
-        color: #777;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 2px 10px;
+        border-radius: 12px;
         margin-left: 15px;
         font-weight: normal;
     }
 
     .output-area {
-        height: calc(100% - 45px);
-        padding: 15px;
+        height: calc(100% - 48px);
+        padding: 16px;
         overflow: auto;
-        background-color: white;
+        background-color: #141416;
     }
 
     #output {
@@ -92,255 +147,153 @@
         white-space: pre-wrap;
         word-wrap: break-word;
         font-family: Consolas, "Courier New", monospace;
-        font-size: 15px;
+        font-size: 0.95rem;
     }
 
     .success {
-        color: #198754;
+        color: #4ec9b0 !important;
     }
 
     .error {
-        color: #dc3545;
+        color: #f87171 !important;
     }
 
     .running {
-        color: #666;
+        color: #facc15 !important;
     }
-
 </style>
 
-
 <div class="container-fluid compiler-container">
-
-    <div class="row h-100 g-0">
+    <div class="row h-100 g-3">
 
         <!-- ========================= -->
         <!-- LEFT SIDE - CODE EDITOR -->
-        <!-- ========================= -->
-
+        <!-- // =========================-->
         <div class="col-md-6 h-100">
-
             <div class="compiler-panel">
 
+                <div style="display: flex;">
                 <!-- HEADER -->
-
                 <div class="compiler-header">
-
                     <div class="file-name">
-
-                        <span style="margin-right:8px;">
-                            🔷
-                        </span>
-
+                        <span class="file-badge">C#</span>
                         HelloWorld.cs
-
                     </div>
-
+                </div>
+                <div style="display:contents">
                     <button type="button"
                             id="runButton"
                             class="run-button"
                             onclick="runCode()">
-
-                        Run ▶
-
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                        </svg>
+                        Run Code
                     </button>
-
                 </div>
-
-
+                </div>
                 <!-- CODE EDITOR -->
-
                 <textarea id="codeEditor"
                           class="editor"
                           spellcheck="false">@ViewBag.Code</textarea>
 
             </div>
-
         </div>
-
 
         <!-- ========================= -->
         <!-- RIGHT SIDE - OUTPUT -->
-        <!-- ========================= -->
-
+        <!-- // =========================-->
         <div class="col-md-6 h-100">
-
             <div class="compiler-panel">
 
                 <div class="output-header">
-
-                    Output:
-
-                    <span id="status"
-                          class="output-info">
-                    </span>
-
+                    <div class="output-title">
+                        Console Output
+                    </div>
+                    <span id="status" class="output-info">Ready</span>
                 </div>
 
-
                 <div class="output-area">
-
                     <pre id="output"></pre>
-
                 </div>
 
             </div>
-
         </div>
 
     </div>
-
 </div>
 
-
 <script>
-
     // ============================================
     // RUN C# CODE
     // ============================================
 
     async function runCode() {
-
-        const code =
-            document.getElementById("codeEditor").value;
-
-        const output =
-            document.getElementById("output");
-
-        const status =
-            document.getElementById("status");
-
-        const runButton =
-            document.getElementById("runButton");
-
+        const code = document.getElementById("codeEditor").value;
+        const output = document.getElementById("output");
+        const status = document.getElementById("status");
+        const runButton = document.getElementById("runButton");
 
         // Validation
-
         if (!code.trim()) {
-
             output.className = "error";
-
-            output.innerText =
-                "Please enter C# code.";
-
+            output.innerText = "Please enter C# code.";
+            status.innerText = "Error";
             return;
         }
 
-
         // Show running
-
         output.className = "running";
-
-        output.innerText =
-            "Compiling and running...";
-
-        status.innerText =
-            "Running...";
-
+        output.innerText = "Compiling and running...";
+        status.innerText = "Running...";
         runButton.disabled = true;
-
-        runButton.innerText =
-            "Running...";
-
+        runButton.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg> Running...`;
 
         try {
+            const response = await fetch('/Module/CompileCSharp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code: code })
+            });
 
-            const response =
-                await fetch('/Module/CompileCSharp', {
-
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-
-                    body: JSON.stringify({
-                        code: code
-                    })
-
-                });
-
-
-            const result =
-                await response.json();
-
-
-            // Compilation / execution successful
+            const result = await response.json();
 
             if (result.success) {
-
                 output.className = "success";
-
-                output.innerText =
-                    result.output || "(Program finished with no output)";
-
-                status.innerText =
-                    "Completed";
-
-            }
-            else {
-
+                output.innerText = result.output || "(Program finished with no output)";
+                status.innerText = "Completed";
+            } else {
                 output.className = "error";
-
-                output.innerText =
-                    result.output;
-
-                status.innerText =
-                    "Error";
-
+                output.innerText = result.output;
+                status.innerText = "Error";
             }
-
         }
         catch (error) {
-
             output.className = "error";
-
-            output.innerText =
-                "Error connecting to compiler:\n\n" +
-                error;
-
-            status.innerText =
-                "Error";
-
+            output.innerText = "Error connecting to compiler:\n\n" + error;
+            status.innerText = "Error";
         }
         finally {
-
             runButton.disabled = false;
-
-            runButton.innerText =
-                "Run ▶";
-
+            runButton.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg> Run Code`;
         }
-
     }
-
 
     // ============================================
     // TAB KEY SUPPORT
     // ============================================
 
-    document
-        .getElementById("codeEditor")
-        .addEventListener("keydown", function (event) {
+    document.getElementById("codeEditor").addEventListener("keydown", function (event) {
+        if (event.key === "Tab") {
+            event.preventDefault();
 
-            if (event.key === "Tab") {
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
 
-                event.preventDefault();
-
-                const start = this.selectionStart;
-                const end = this.selectionEnd;
-
-                this.value =
-                    this.value.substring(0, start) +
-                    "    " +
-                    this.value.substring(end);
-
-                this.selectionStart =
-                    this.selectionEnd =
-                    start + 4;
-
-            }
-
-        });
-
+            this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + 4;
+        }
+    });
 </script>
